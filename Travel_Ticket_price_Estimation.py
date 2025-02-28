@@ -1,13 +1,10 @@
 import streamlit as st 
+import os 
 # Logic -1 preaparing Templet
 
 st.title("🛣️ Ticket Price Estimation") 
 st.subheader("Get an approximate cost for your journey")
 from langchain_core.prompts import ChatPromptTemplate
-
-# templet=ChatPromptTemplate(messages=[
-#     ('system', 'You are an AI assistant for estimating average ticket price or cost.'),
-#     ('human', 'Estimate and return the all types of classes average cost of traveling from {source} to {destination} using only {mode}.return only estimated avg costs of all classes.')])
 
 templet=ChatPromptTemplate(messages=[
     ('system', 'You are an AI assistant for estimating average ticket price or cost and plan the trip.'),
@@ -20,9 +17,7 @@ templet=ChatPromptTemplate(messages=[
 
 #  Logic - 2 
 from langchain_google_genai import ChatGoogleGenerativeAI
-# with open(r"api_key.txt",'r') as key:
-#     api_key=key.readline()
-api_key="AIzaSyC9j5KaPVcanw9nvPAfKfORBqsCzBjx37I"
+api_key = os.getenv("api_key")
 chat_model=ChatGoogleGenerativeAI(api_key=api_key,model="gemini-2.0-flash-exp")
 
 
@@ -34,15 +29,11 @@ s=st.text_input("Enter the Starting point: ")
 d=st.text_input("Enter your destination: ")
 m=st.text_input("Enter which mode do you want to travel: ")
 date=st.date_input("select the date for your trip: ")
-# s=input("enter starting point:")
-# d=input("enter destination: ")
-# m=input("enter which mode you want to travel: ")
 
 raw_input={'source':s,"destination":d,"mode":m,"date":date}
 
 chain= templet | chat_model | output_parser 
 if st.button("Estimate"):
     result=chain.invoke(raw_input)
-# print(result)
     st.write(result)
 
